@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Server for an invoice app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tyler-Williams/Vue-Invoice"
+  },
+  "author": "Tyler Williams",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Tyler-Williams/Vue-Invoice/issues"
+  },
+  "homepage": "https://github.com/Tyler-Williams/Vue-Invoice#readme",
+  "dependencies": {
+    "bcrypt": "^2.0.1",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "connect-multiparty": "^2.1.0",
+    "express": "^4.16.3",
+    "parth": "^4.2.3",
+    "sqlite3": "^4.0.0",
+    "umzug": "^2.1.0"
+  }
+}
