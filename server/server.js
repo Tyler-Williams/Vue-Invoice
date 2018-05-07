@@ -26,6 +26,7 @@ app.listen(PORT, () => {
 })
 
 app.post('/register', (req, res) => {
+  console.log(req.body)
   if (isEmpty(req.body.name) || isEmpty(req.body.email) || isEmpty(req.body.company_name) || isEmpty(req.body.password)) {
     return res.json({
       status : false,
@@ -93,7 +94,6 @@ app.post('/invoice', multipartMiddleware, (req, res) => {
       message: 'Invoice needs a name'
     })
   }
-
   let db = new sqlite3.Database(databaseLocation)
   let sql = `INSERT INTO invoices(name,user_id,paid)
     VALUES(
@@ -136,7 +136,7 @@ app.post('/invoice', multipartMiddleware, (req, res) => {
 
 app.get('/invoice/user/:user_id', multipartMiddleware, (req, res) => {
   let db = new sqlite3.Database(databaseLocation)
-  let sql = `SELECT * FROM invoices LEFT JOIN transactions ON invoices.id=transactions.invoice_id
+  let sql = `SELECT * FROM invoices
     WHERE user_id='${req.params.user_id}'`
 
 
@@ -146,23 +146,29 @@ app.get('/invoice/user/:user_id', multipartMiddleware, (req, res) => {
     }
     return res.json({
       status: true,
-      transactions: rows
+      invoices: rows
     })
   })
 })
 
 app.get('/invoice/user/:user_id/:invoice_id', multipartMiddleware, (req, res) => {
-  let db = new sqlite3.Database(databaseLocation)
-  let sql = `SELECT * FROM invoices LEFT JOIN transactions ON invoices.id=transactions.invoice_id
-    WHERE user_id='${req.params.user_id}' AND invoice_id='${req.params.invoice_id}'`
+  const db = new sqlite3.Database(databaseLocation)
+  const sql = `SELECT * FROM invoices
+    WHERE user_id='${req.params.user_id}' AND id='${req.params.invoice_id}'`
 
   db.all(sql, [], (err, rows) => {
     if (err) {
       throw err
     }
-    return res.json({
-      status: true,
-      transactions: rows
+    const invoice = rows[0]
+    const fetchInvoiceDataSql = `SELECT * FROM transactions WHERE invoice_id=${req.params.invoice_id}`
+
+    db.all(fetchInvoiceDataSql, [], (err, rows) => {
+      return res.json({
+        status: true,
+        invoice: invoice,
+        transactions: rows
+      })
     })
   })
 })
