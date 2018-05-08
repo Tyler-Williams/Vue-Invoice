@@ -1,8 +1,8 @@
 <template>
   <div>
-    <span style="font-size: 30px; cursor: pointer;" @click="openNav">&#9776;</span>
+    <span style="font-size:30px; cursor:pointer;" @click="openNav">&#9776;</span>
     <div id="leftsidenav" class="sidenav">
-      <p style="font-size: 12px; cursor: pointer;" @click="closeNav"><em>Close Nav</em></p>
+      <p style="font-size:12px; cursor:pointer;" @click="closeNav"><em>Close Nav</em></p>
       <p><em>Company: {{ company }} </em></p>
       <h3>Welcome, {{ name }} </h3>
       <p class="clickable" @click="setActive('create')">Create Invoice</p>
@@ -29,7 +29,7 @@ export default {
       document.getElementById('leftsidenav').style.width = '20%'
     },
     closeNav () {
-      document.getElementById('leftsidenav').style.width = '20%'
+      document.getElementById('leftsidenav').style.width = '0%'
     }
   }
 }

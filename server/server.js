@@ -3,6 +3,8 @@ const bodyParser = require('body-parser')
 const sqlite3 = require('sqlite3')
 const bcrypt = require('bcrypt')
 const mulitpart = require('connect-multiparty')
+const jwt = require('jsonwebtoken')
+const cors = require('cors')
 
 const saltRounds = 10
 const PORT = process.env.PORT || 3128
@@ -10,8 +12,36 @@ const multipartMiddleware = mulitpart()
 const databaseLocation = './database/InvoicingApp.db'
 
 const app = express()
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
+app.use(cors())
+
+//  PROTECT ROUTES
+app.use(function (req, res, next) {
+  const token = req.body.token || req.query.token || req.headers['x-access-token']
+
+  //  DECODE
+  if (token) {
+    jwt.verify(token, app.get('appSecret'), (err, decoded) => {
+      if (err) {
+        return res.json({
+          status: false,
+          message: 'Failed to auth token'
+        })
+      } else {
+        req.decoded = decoded
+        next()
+      }
+    })
+  } else {
+    return res.status(403).send({
+      success: false,
+      message: 'No token provided'
+    })
+  }
+})
+
+app.set('appSecret', 'secretforinvoicingapp')
 
 function isEmpty(str) {
   return !str || 0 === str.length;
@@ -26,7 +56,7 @@ app.listen(PORT, () => {
 })
 
 app.post('/register', (req, res) => {
-  console.log(req.body)
+  console.log('Registering: ', req.body)
   if (isEmpty(req.body.name) || isEmpty(req.body.email) || isEmpty(req.body.company_name) || isEmpty(req.body.password)) {
     return res.json({
       status : false,
@@ -34,7 +64,7 @@ app.post('/register', (req, res) => {
     })
   }
 
-  bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
+  bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
     let db = new sqlite3.Database(databaseLocation)
     let sql = `INSERT INTO users(name,email,company_name,password)
       VALUES(
@@ -43,13 +73,29 @@ app.post('/register', (req, res) => {
         '${req.body.company_name}',
         '${hash}')`
 
-    db.run(sql, (err) => {
+    db.run(sql, function (err) {
       if (err) {
         throw err
       } else {
-        return res.json({
-          status: true,
-          message: 'User Created'
+        let userId = this.lastID
+        let query = `SELECT * FROM users WHERE id='${userId}'`
+        db.all(query, [], (err, rows) => {
+          if (err) {
+            throw err
+          }
+          let user = rows[0]
+          delete user.password
+
+          const payload = { user: user }
+          let token = jwt.sign(payload, app.get('appSecret'), {
+            expiresIn: '24h'
+          })
+
+          return res.json({
+            status: true,
+            user: user,
+            token: token
+          })
         })
       }
     })
@@ -75,9 +121,14 @@ app.post('/login', (req, res) => {
     let authenticated = bcrypt.compareSync(req.body.password, user.password)
     delete user.password
     if (authenticated) {
+      const payload = { user: user}
+      let token = jwt.sign(payload, app.get('appSecret'), {
+        expiresIn: '24h'
+      })
       return res.json({
         status: true,
-        user: user
+        user: user,
+        token: token
       })
     }
     return res.json({

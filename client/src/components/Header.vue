@@ -12,7 +12,7 @@ import SideNav from '@/components/SideNav'
 export default {
   name: 'Header',
   props: ['user'],
-  compnents: {
+  components: {
     SideNav
   },
   data () {
@@ -22,7 +22,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

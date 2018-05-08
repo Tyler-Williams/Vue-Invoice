@@ -21,7 +21,10 @@
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "connect-multiparty": "^2.1.0",
+    "cors": "^2.8.4",
     "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.1",
+    "nodemon": "^1.17.4",
     "path": "^0.12.7",
     "sqlite3": "^4.0.0",
     "umzug": "^2.1.0"

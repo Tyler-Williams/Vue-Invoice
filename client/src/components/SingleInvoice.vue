@@ -73,7 +73,7 @@ export default {
     return {
       invoice: {},
       transactions: [],
-      user: JSON.parse(localStorage.getItem('user')),
+      user: {},
       total_price: 0,
       recipient: {
         name: '',

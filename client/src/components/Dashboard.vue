@@ -1,12 +1,11 @@
 <template>
   <div class="container-fluid" style="padding: 0px;">
-    <header v-bind:user="user"/>
+    <Header v-bind:user="user"/>
     <template v-if="this.isactive == 'create'">
-      <view-invoices />
       <create-invoice />
     </template>
     <template v-else>
-
+      <view-invoices />
     </template>
   </div>
 </template>
@@ -26,15 +25,12 @@ export default {
     return {
       isactive: 'create',
       title: 'Invoicing App',
-      user: JSON.parse(localStorage.getItem('user')) || null
+      user: this.$route.params.user || null
     }
   },
   mounted () {
     this.user = JSON.parse(localStorage.getItem('user'))
+    //  FOR DEBUG console.log('User: ', JSON.parse(localStorage.getItem('user')))
   }
 }
 </script>
-
-<style scoped>
-
-</style>
